@@ -11,8 +11,11 @@ namespace HungarianCalculator
 
             
             Calculator c = new Calculator();
-            var a =c.ProcessInput("134 +2");
-            var b = c.Calculate(a);
+            //var a =c.ProcessInput("134 +2");
+           // var b = c.Calculate(a);
+
+            var a1 = c.ProcessInput("134 +2 /2");
+            var b1 = c.Calculate(a1);
             Console.ReadLine();
         }
     }

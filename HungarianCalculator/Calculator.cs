@@ -13,9 +13,9 @@ namespace HungarianCalculator
             if (!ar.Values.TryDequeue(out a))
                 return double.NaN;
 
-            while (ar.Values.TryDequeue(out b) || ar.Operators.TryDequeue(out currentOp))
+            while (ar.Values.TryDequeue(out b) & ar.Operators.TryDequeue(out currentOp))
             {
-                if (ar.Operators.Count() > 1 || currentOp.GetPrecedence() < ar.Operators.Peek().GetPrecedence())
+                if ((ar.Operators.Count() > 1 && currentOp.GetPrecedence() > ar.Operators.Peek().GetPrecedence()) || (ar.Operators.Count() == 0))
                 {
 
                     if (!(buffer != double.NaN))
@@ -25,6 +25,7 @@ namespace HungarianCalculator
                     }
                     a = Compute(currentOp, a, b);
                 }
+                
                 else
                 {
                     //the next operator have increase precedence - need to bufferezed arguments for deferred computation
