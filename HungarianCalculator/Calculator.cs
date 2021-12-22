@@ -1,61 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using static HungarianCalculator.OperatorService;
 
 namespace HungarianCalculator
 {
     public class Calculator : ICalculator
-    {    
-        public double Calculate(IArithmeticRegular arithmeticRegular)
+    {
+        public double Calculate(IArithmeticExpression ar)
         {
-            return double.NaN;
+            double a = 0, b = 0, buffer = double.NaN;
+            Operator currentOp = Operator.NotAOperator, bufferOp = Operator.NotAOperator;
+
+            if (!ar.Values.TryDequeue(out a))
+                return double.NaN;
+
+            while (ar.Values.TryDequeue(out b) || ar.Operators.TryDequeue(out currentOp))
+            {
+                if (ar.Operators.Count() > 1 || currentOp.GetPrecedence() < ar.Operators.Peek().GetPrecedence())
+                {
+
+                    if (!(buffer != double.NaN))
+                    {
+                        a = Compute(bufferOp, buffer, a);
+                        buffer = double.NaN;
+                    }
+                    a = Compute(currentOp, a, b);
+                }
+                else
+                {
+                    //the next operator have increase precedence - need to bufferezed arguments for deferred computation
+                    buffer = a;
+                    bufferOp = currentOp;
+                }
+            }
+
+            if (ar.Operators.Count() == 0 && ar.Values.Count() == 0)
+                return a;
+            else
+                return double.NaN;
         }
 
-        private void processOperator(Operator op)
+        public double Compute(Operator op, double a, double b)
         {
-            double a = 0, b = 0;
-            //if (!arithmeticRegular.Values.TryDequeue(out a))
-            //{
-            //    //isError = true;
-            //    return;
-            //}
-            //if (!arithmeticRegular.Values.TryDequeue(out b))
-            //{
-            //    //isError = true;
-            //    return;
-            //}
-            double result = 0;
             switch (op)
             {
                 case Operator.Multiplication:
-                    result = a * b;
-                    break;
+                    return a * b;
                 case Operator.Division:
-                    result = a / b;
-                    break;
+                    return a / b;
                 case Operator.Sum:
-                    result = a + b;
-                    break;
+                    return a + b;
                 case Operator.Subtraction:
-                    result = a - b;
-                    break;
+                    return a - b;
                 default:
-                    break;
+                    return double.NaN;
             }
         }
 
-        public ArithmeticRegular ProcessInput(string ArithmeticStringutString)
+        public ArithmeticExpression ProcessInput(string ArithmeticString)
         {
-            ArithmeticRegular result = new();
+            ArithmeticExpression result = new();
             int numberCounter = 0;
             bool isNumber = false;
             double addNumber;
-            char[] tokens = ArithmeticStringutString.ToCharArray();
+            char[] tokens = ArithmeticString.ToCharArray();
             for (int i = 0; i < tokens.Length; i++)
             {
+                var a = tokens[i];//TODO delete
                 if (char.IsDigit(tokens[i]))
                 {
                     isNumber = true;
@@ -65,19 +75,23 @@ namespace HungarianCalculator
                 {
                     if (isNumber)
                     {
-                        double.TryParse(ArithmeticStringutString.Substring(i - numberCounter, numberCounter), out addNumber);
+                        double.TryParse(ArithmeticString.Substring(i - numberCounter, numberCounter), out addNumber);
                         result.Values.Enqueue(addNumber);
+                        numberCounter = 0;
+                        isNumber = false;
                     }
-                    isNumber = false;
                 }
+
+                if (tokens[i].isOperator())
+                    result.Operators.Enqueue(tokens[i].ToOperator());
 
                 if (string.IsNullOrWhiteSpace(tokens[i].ToString()))
                     continue;
-
-                //if (isOperator(tokens[i]))
-                //{
-                //    result.Operators.Enqueue(Calculator.ToOperator(tokens[i]));
-                //}
+                if (i == tokens.Length - 1)
+                {
+                    double.TryParse(ArithmeticString.Substring(i - numberCounter + 1, numberCounter), out addNumber);
+                    result.Values.Enqueue(addNumber);
+                }
             }
             return result;
         }

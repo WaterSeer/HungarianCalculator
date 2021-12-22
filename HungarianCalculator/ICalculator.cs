@@ -2,6 +2,6 @@
 {
     public interface ICalculator
     {
-        public double Calculate(IArithmeticRegular arithmeticRegular);
+        public double Calculate(IArithmeticExpression arithmeticRegular);
     }
 }

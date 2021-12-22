@@ -9,9 +9,15 @@ using static HungarianCalculator.OperatorService;
 
 namespace HungarianCalculator
 {
-    public class ArithmeticRegular
+    public class ArithmeticExpression : IArithmeticExpression
     {        
         public Queue<Operator> Operators { get; set; }
-        public Queue<double> Values { get; set; }     
+        public Queue<double> Values { get; set; }
+
+        public ArithmeticExpression()
+        {
+            Operators = new Queue<Operator>();
+            Values = new Queue<double>();
+        }
     }
 }

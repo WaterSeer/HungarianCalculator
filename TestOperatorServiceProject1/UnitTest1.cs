@@ -118,5 +118,11 @@ namespace Tests
             var result = '1'.ToOperator();
             Assert.AreEqual(result, Operator.NotAOperator);
         }
+
+        [Test]
+        public void Precedence_CheckSequense_HighGraterThanLow()
+        {            
+            Assert.Greater(Precedense.High, Precedense.Low);
+        }
     }
 }

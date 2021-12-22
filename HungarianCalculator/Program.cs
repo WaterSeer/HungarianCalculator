@@ -5,8 +5,15 @@ namespace HungarianCalculator
     class Program
     {
         static void Main(string[] args)
-        {            
-            Console.WriteLine("Hello World!");
+        {
+            ArithmeticExpression ae = new ArithmeticExpression();
+            ae.Values.Enqueue(123);
+
+            
+            Calculator c = new Calculator();
+            var a =c.ProcessInput("134 +2");
+            var b = c.Calculate(a);
+            Console.ReadLine();
         }
     }
 }
