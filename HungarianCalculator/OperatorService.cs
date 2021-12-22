@@ -2,9 +2,13 @@
 {
     public static class OperatorService
     {
-        private static bool isOperator(this char ch)
+        public enum Operator
         {
-            return (ch == '+' || ch == '-' || ch == '*' || ch == '/');
+            Multiplication,
+            Division,
+            Sum,
+            Subtraction,
+            NotAOperator
         }
 
         public enum Precedense
@@ -13,18 +17,14 @@
             High
         }
 
-        public enum Operator
+        public static bool isOperator(this char ch)
         {
-            Multiply,
-            Divide,
-            Sum,
-            chan,
-            NotOperator
+            return (ch == '+' || ch == '-' || ch == '*' || ch == '/');
         }
 
-        private static Precedense getPrecedence(this Operator op)
+        public static Precedense GetPrecedence(this Operator op)
         {
-            if (op == Operator.Multiply || op == Operator.Divide)
+            if (op is Operator.Multiplication || op is Operator.Division)
                 return Precedense.High;
             else
                 return Precedense.Low;
@@ -37,13 +37,13 @@
                 case '+':
                     return Operator.Sum;
                 case '-':
-                    return Operator.chan;
+                    return Operator.Subtraction;
                 case '*':
-                    return Operator.Multiply;
+                    return Operator.Multiplication;
                 case '/':
-                    return Operator.Divide;
+                    return Operator.Division;
                 default:
-                    return Operator.NotOperator;
+                    return Operator.NotAOperator;
             }
         }
     }
