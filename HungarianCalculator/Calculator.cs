@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using static HungarianCalculator.OperatorService;
 
 namespace HungarianCalculator
@@ -97,16 +98,20 @@ namespace HungarianCalculator
             return result;
         }
 
-        public Dictionary<int, int> FindBrakets(string ArithmeticString)
+        public int[,] FindBrakets(string ArithmeticString)
         {
             Stack<int> curles = new Stack<int>();
             Dictionary<int, int> result = new Dictionary<int, int>();
+            
+
             char[] tokens = ArithmeticString.ToCharArray();
+            int[,] r = new int[2, tokens.Length];
             for (int i = 0; i < tokens.Length; i++)
             {
                 if (tokens[i] == '(')
                 {
                     result.Add(i, 0);
+                    r[0,i]
                     curles.Push(i);
                 }
                 if (tokens[i] == ')')
@@ -115,18 +120,25 @@ namespace HungarianCalculator
                     curles.Pop();
                 }
             }
-            if (curles.Count == 0)
-                return result;
-            else
-                return null;            
+            if (curles.Count != 0)                
+                return null;
+            foreach (var item in result)
+            {
+
+            }
         }
 
-        public IArithmeticExpression OpenCurles(string AritmeticsString, Dictionary<int, int> curles)
+        public IArithmeticExpression OpenBrakets(string AritmeticsString, Dictionary<int, int> curles)
         {
             Calculator c = new Calculator();
-            for (int i = curles.Count; i >= 0; i--)
+            StringBuilder sb;            
+            int key;
+            while(curles.Count != 0)
             {
-                c.Calculate(c.ProcessInput())
+                key = curles.Last().Key;
+                sb = new StringBuilder(AritmeticsString, key, curles[key], );
+                c.Calculate(c.ProcessInput(sb.ToString()));
+                sb = (key != 0 ? new StringBuilder(AritmeticsString, key, curles[key] - key, ))
             }
         }
     }
