@@ -15,21 +15,22 @@ namespace HungarianCalculator
 
             while (ar.Values.TryDequeue(out b) & ar.Operators.TryDequeue(out currentOp))
             {
-                if ((ar.Operators.Count() > 1 && currentOp.GetPrecedence() > ar.Operators.Peek().GetPrecedence()) || (ar.Operators.Count() == 0))
+                if ((ar.Operators.Count() > 0 && currentOp.GetPrecedence() > ar.Operators.Peek().GetPrecedence()) || (ar.Operators.Count() == 0))
                 {
-
-                    if (!(buffer != double.NaN))
+                    a = Compute(currentOp, a, b);
+                    if (buffer is not double.NaN)
                     {
                         a = Compute(bufferOp, buffer, a);
                         buffer = double.NaN;
                     }
-                    a = Compute(currentOp, a, b);
+                    
                 }
                 
                 else
                 {
                     //the next operator have increase precedence - need to bufferezed arguments for deferred computation
                     buffer = a;
+                    a = b;
                     bufferOp = currentOp;
                 }
             }
