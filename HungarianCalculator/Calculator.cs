@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using static HungarianCalculator.OperatorService;
 
 namespace HungarianCalculator
@@ -23,9 +24,7 @@ namespace HungarianCalculator
                         a = Compute(bufferOp, buffer, a);
                         buffer = double.NaN;
                     }
-                    
                 }
-                
                 else
                 {
                     //the next operator have increase precedence - need to bufferezed arguments for deferred computation
@@ -67,7 +66,6 @@ namespace HungarianCalculator
             char[] tokens = ArithmeticString.ToCharArray();
             for (int i = 0; i < tokens.Length; i++)
             {
-                var a = tokens[i];//TODO delete
                 if (char.IsDigit(tokens[i]))
                 {
                     isNumber = true;
@@ -89,6 +87,7 @@ namespace HungarianCalculator
 
                 if (string.IsNullOrWhiteSpace(tokens[i].ToString()))
                     continue;
+
                 if (i == tokens.Length - 1)
                 {
                     double.TryParse(ArithmeticString.Substring(i - numberCounter + 1, numberCounter), out addNumber);
@@ -96,6 +95,39 @@ namespace HungarianCalculator
                 }
             }
             return result;
+        }
+
+        public Dictionary<int, int> FindBrakets(string ArithmeticString)
+        {
+            Stack<int> curles = new Stack<int>();
+            Dictionary<int, int> result = new Dictionary<int, int>();
+            char[] tokens = ArithmeticString.ToCharArray();
+            for (int i = 0; i < tokens.Length; i++)
+            {
+                if (tokens[i] == '(')
+                {
+                    result.Add(i, 0);
+                    curles.Push(i);
+                }
+                if (tokens[i] == ')')
+                {
+                    result[curles.Peek()] = i;
+                    curles.Pop();
+                }
+            }
+            if (curles.Count == 0)
+                return result;
+            else
+                return null;            
+        }
+
+        public IArithmeticExpression OpenCurles(string AritmeticsString, Dictionary<int, int> curles)
+        {
+            Calculator c = new Calculator();
+            for (int i = curles.Count; i >= 0; i--)
+            {
+                c.Calculate(c.ProcessInput())
+            }
         }
     }
 }

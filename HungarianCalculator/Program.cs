@@ -13,7 +13,7 @@ namespace HungarianCalculator
             
            
 
-            var a1 = c.ProcessInput("134 +2 /2");
+            var a1 = c.ProcessInput("1-10-3/0");
             var b1 = c.Calculate(a1);
             Console.ReadLine();
         }
