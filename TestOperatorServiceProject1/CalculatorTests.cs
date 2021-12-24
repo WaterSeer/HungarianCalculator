@@ -82,6 +82,61 @@ namespace Tests
             Calculator c = new Calculator();
             var result = c.Calculate(c.ProcessInput("100/2+2/2"));
             Assert.AreEqual(result, answer);
+        }       
+
+        [Test]
+        public void Calculate_Check2Sum3Brackets_Return5()
+        {
+            double answer = 5;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("(2+3)"));
+            Assert.AreEqual(result, answer);
+        }
+
+        [Test]
+        public void Calculate_Check2Sum3Brakets_Return7()
+        {
+            double answer = 7;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("(2+3+2)"));
+            Assert.AreEqual(result, answer);
+        }
+        
+
+        [Test]
+        public void Calculate_Brakets_1_Return11()
+        {
+            double answer = 11;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("2+3*(1+2)"));
+            Assert.AreEqual(result, answer);
+        }
+       
+        [Test]
+        public void Calculate_Brakets_2_Return4()
+        {
+            double answer = 4;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("(4+4)/2"));
+            Assert.AreEqual(result, answer);
+        }
+
+        [Test]
+        public void Calculate_Brakets_3_Return11()
+        {
+            double answer = 11;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("1+2*(3+2)"));
+            Assert.AreEqual(result, answer);
+        }
+
+        [Test]
+        public void Calculate_Brakets_4_Return15()
+        {
+            double answer = 15;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("2+15/3+4*2"));
+            Assert.AreEqual(result, answer);
         }
 
 

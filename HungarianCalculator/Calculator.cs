@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using static HungarianCalculator.OperatorService;
 
 namespace HungarianCalculator
@@ -9,12 +8,11 @@ namespace HungarianCalculator
     {
         public double Calculate(IArithmeticExpression ar)
         {
-            double a = 0, b = 0, buffer = double.NaN;
+            double buffer = double.NaN;
             Operator currentOp = Operator.NotAOperator, bufferOp = Operator.NotAOperator;
-
+            double a, b;
             if (!ar.Values.TryDequeue(out a))
                 return double.NaN;
-
             while (ar.Values.TryDequeue(out b) & ar.Operators.TryDequeue(out currentOp))
             {
                 if ((ar.Operators.Count() > 0 && currentOp.GetPrecedence() > ar.Operators.Peek().GetPrecedence()) || (ar.Operators.Count() == 0))
@@ -61,12 +59,40 @@ namespace HungarianCalculator
         public ArithmeticExpression ProcessInput(string ArithmeticString)
         {
             ArithmeticExpression result = new();
+            Stack<char> brackets = new Stack<char>();
             int numberCounter = 0;
             bool isNumber = false;
             double addNumber;
             char[] tokens = ArithmeticString.ToCharArray();
             for (int i = 0; i < tokens.Length; i++)
             {
+                var ab = tokens[i];
+                if (tokens[i] == '(')
+                {
+                    var str = ArithmeticString.Substring(i + 1, tokens.Length - i - 1);
+                    var pi = ProcessInput(str);
+                    var numberInBrackets = Calculate(pi);
+                    result.Values.Enqueue(numberInBrackets);
+
+                    brackets.Push('(');
+                    for (int j = 0; j < str.Length; j++)
+                    {
+                        if (brackets.Count == 0)
+                        {
+                            break;
+                        }
+                        if (str[j] == '(')
+                            brackets.Push('(');
+                        if (str[j] == ')')
+                        {
+                            brackets.Pop();
+                            i = i + j + 1;
+                        }
+                    }
+                    continue;
+                    ////TODO :неверное количество скобок
+                }
+
                 if (char.IsDigit(tokens[i]))
                 {
                     isNumber = true;
@@ -89,6 +115,11 @@ namespace HungarianCalculator
                 if (string.IsNullOrWhiteSpace(tokens[i].ToString()))
                     continue;
 
+                if (tokens[i] == ')')
+                {
+                    return result;
+                }
+
                 if (i == tokens.Length - 1)
                 {
                     double.TryParse(ArithmeticString.Substring(i - numberCounter + 1, numberCounter), out addNumber);
@@ -96,50 +127,6 @@ namespace HungarianCalculator
                 }
             }
             return result;
-        }
-
-        public int[,] FindBrakets(string ArithmeticString)
-        {
-            Stack<int> curles = new Stack<int>();
-            Dictionary<int, int> result = new Dictionary<int, int>();
-            
-
-            char[] tokens = ArithmeticString.ToCharArray();
-            int[,] r = new int[2, tokens.Length];
-            for (int i = 0; i < tokens.Length; i++)
-            {
-                if (tokens[i] == '(')
-                {
-                    result.Add(i, 0);
-                    r[0,i]
-                    curles.Push(i);
-                }
-                if (tokens[i] == ')')
-                {
-                    result[curles.Peek()] = i;
-                    curles.Pop();
-                }
-            }
-            if (curles.Count != 0)                
-                return null;
-            foreach (var item in result)
-            {
-
-            }
-        }
-
-        public IArithmeticExpression OpenBrakets(string AritmeticsString, Dictionary<int, int> curles)
-        {
-            Calculator c = new Calculator();
-            StringBuilder sb;            
-            int key;
-            while(curles.Count != 0)
-            {
-                key = curles.Last().Key;
-                sb = new StringBuilder(AritmeticsString, key, curles[key], );
-                c.Calculate(c.ProcessInput(sb.ToString()));
-                sb = (key != 0 ? new StringBuilder(AritmeticsString, key, curles[key] - key, ))
-            }
         }
     }
 }

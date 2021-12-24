@@ -4,11 +4,11 @@
     {
         public enum Operator
         {
+            NotAOperator,
             Multiplication,
             Division,
             Sum,
             Subtraction,
-            NotAOperator
         }
 
         public enum Precedense
