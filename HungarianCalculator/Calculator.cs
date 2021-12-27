@@ -8,6 +8,9 @@ namespace HungarianCalculator
     {
         public double Calculate(IArithmeticExpression ar)
         {
+            if (ar.Values.Count != ar.Operators.Count + 1)
+                return double.NaN;
+            
             double buffer = double.NaN;
             Operator currentOp = Operator.NotAOperator, bufferOp = Operator.NotAOperator;
             double a, b;
@@ -37,7 +40,7 @@ namespace HungarianCalculator
                 return a;
             else
                 return double.NaN;
-        }
+        }        
 
         public double Compute(Operator op, double a, double b)
         {
@@ -67,6 +70,22 @@ namespace HungarianCalculator
             for (int i = 0; i < tokens.Length; i++)
             {
                 var ab = tokens[i];
+                if (char.IsDigit(tokens[i]))
+                {
+                    isNumber = true;
+                    numberCounter++;
+                }
+                else
+                {
+                    if (isNumber)
+                    {
+                        double.TryParse(ArithmeticString.Substring(i - numberCounter, numberCounter), out addNumber);
+                        result.Values.Enqueue(addNumber);
+                        numberCounter = 0;
+                        isNumber = false;
+                    }
+                }
+
                 if (tokens[i] == '(')
                 {
                     var str = ArithmeticString.Substring(i + 1, tokens.Length - i - 1);
@@ -86,28 +105,16 @@ namespace HungarianCalculator
                         if (str[j] == ')')
                         {
                             brackets.Pop();
-                            i = i + j + 1;
+                            if (brackets.Count == 0)
+                            {
+                                i = i + j + 1;
+                                break;
+                            }
                         }
                     }
                     continue;
                     ////TODO :неверное количество скобок
-                }
-
-                if (char.IsDigit(tokens[i]))
-                {
-                    isNumber = true;
-                    numberCounter++;
-                }
-                else
-                {
-                    if (isNumber)
-                    {
-                        double.TryParse(ArithmeticString.Substring(i - numberCounter, numberCounter), out addNumber);
-                        result.Values.Enqueue(addNumber);
-                        numberCounter = 0;
-                        isNumber = false;
-                    }
-                }
+                }                
 
                 if (tokens[i].isOperator())
                     result.Operators.Enqueue(tokens[i].ToOperator());

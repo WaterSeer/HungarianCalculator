@@ -138,6 +138,24 @@ namespace Tests
             var result = c.Calculate(c.ProcessInput("2+15/3+4*2"));
             Assert.AreEqual(result, answer);
         }
+        
+        [Test]
+        public void Calculate_Brakets_5_Return24()
+        {
+            double answer = 24;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("4+(4+(4+4)+4)+4"));
+            Assert.AreEqual(result, answer);
+        }
+
+        [Test]
+        public void Calculate_Brakets_6_Return24()
+        {
+            double answer = 24;
+            Calculator c = new Calculator();
+            var result = c.Calculate(c.ProcessInput("(4+(4+(4+4)+4)+4)"));
+            Assert.AreEqual(result, answer);
+        }
 
 
     }
