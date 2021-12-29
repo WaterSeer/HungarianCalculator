@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HungarianCalculator
 {
@@ -11,38 +7,38 @@ namespace HungarianCalculator
     {
         public IEnumerable<string> ReadFromFile(string path)
         {
-            using(StreamReader sr = new StreamReader(path, System.Text.Encoding.Default))
+            using (StreamReader streamReader = new StreamReader(path, System.Text.Encoding.Default))
             {
                 List<string> result = new List<string>();
-                string line;
-                while ((line = sr.ReadLine()) != null)
+                string lineFromStream;
+                while ((lineFromStream = streamReader.ReadLine()) != null)
                 {
-                    result.Add(line);
+                    result.Add(lineFromStream);
                 }
                 return result;
-            } 
+            }
         }
 
         public void WriteToFile(IEnumerable<string> lines, string writePath)
         {
-            Calculator c = new Calculator();
-            using (StreamWriter sw = new StreamWriter(writePath, false, System.Text.Encoding.Default))
+            Calculator calculator = new Calculator();
+            using (StreamWriter streamWriter = new StreamWriter(writePath, false, System.Text.Encoding.Default))
             {
                 foreach (var item in lines)
                 {
-                    switch (c.Calculate(c.ProcessInput(item)))
+                    switch (calculator.Calculate(calculator.GetArithmeticExpression(item)))
                     {
                         case double.NegativeInfinity:
-                            sw.WriteLine(item + " = ошибка деления на ноль");
+                            streamWriter.WriteLine(item + " = ошибка деления на ноль");
                             break;
                         case double.PositiveInfinity:
-                            sw.WriteLine(item + " = ошибка деления на ноль");
+                            streamWriter.WriteLine(item + " = ошибка деления на ноль");
                             break;
                         case double.NaN:
-                            sw.WriteLine(item + " = ошибка в выражении");
-                            break;                        
+                            streamWriter.WriteLine(item + " = ошибка в выражении");
+                            break;
                         default:
-                            sw.WriteLine(item + " = " + c.Calculate(c.ProcessInput(item)));
+                            streamWriter.WriteLine(item + " = " + calculator.Calculate(calculator.GetArithmeticExpression(item)));
                             break;
                     }
                 }

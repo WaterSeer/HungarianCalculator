@@ -6,45 +6,49 @@ namespace HungarianCalculator
 {
     public class Calculator : ICalculator
     {
-        public double Calculate(IArithmeticExpression ar)
+        public double Calculate(IArithmeticExpression arithmeticExpression)
         {
-            if (ar.Values.Count != ar.Operators.Count + 1)
+            if (arithmeticExpression is null)
                 return double.NaN;
-            
-            double buffer = double.NaN;
-            Operator currentOp = Operator.NotAOperator, bufferOp = Operator.NotAOperator;
-            double a, b;
-            if (!ar.Values.TryDequeue(out a))
+
+            if (arithmeticExpression.Values.Count != arithmeticExpression.Operators.Count + 1)
                 return double.NaN;
-            while (ar.Values.TryDequeue(out b) & ar.Operators.TryDequeue(out currentOp))
+
+            double valueInBuffer = double.NaN;
+            Operator currentOperator = Operator.NotAOperator;
+            Operator bufferInOperator = Operator.NotAOperator;
+            double firstValue, secondValue;
+            if (!arithmeticExpression.Values.TryDequeue(out firstValue))
+                return double.NaN;
+            while (arithmeticExpression.Values.TryDequeue(out secondValue) & arithmeticExpression.Operators.TryDequeue(out currentOperator))
             {
-                if ((ar.Operators.Count() > 0 && currentOp.GetPrecedence() > ar.Operators.Peek().GetPrecedence()) || (ar.Operators.Count() == 0))
+                if ((arithmeticExpression.Operators.Count() > 0 && currentOperator.GetPrecedence() > arithmeticExpression.Operators.Peek().GetPrecedence()) || (arithmeticExpression.Operators.Count() == 0))
                 {
-                    a = Compute(currentOp, a, b);
-                    if (buffer is not double.NaN)
+                    firstValue = Compute(currentOperator, firstValue, secondValue);
+                    if (valueInBuffer is not double.NaN)
                     {
-                        a = Compute(bufferOp, buffer, a);
-                        buffer = double.NaN;
+                        firstValue = Compute(bufferInOperator, valueInBuffer, firstValue);
+                        valueInBuffer = double.NaN;
                     }
                 }
                 else
                 {
                     //the next operator have increase precedence - need to bufferezed arguments for deferred computation
-                    buffer = a;
-                    a = b;
-                    bufferOp = currentOp;
+                    valueInBuffer = firstValue;
+                    firstValue = secondValue;
+                    bufferInOperator = currentOperator;
                 }
             }
 
-            if (ar.Operators.Count() == 0 && ar.Values.Count() == 0)
-                return a;
+            if (arithmeticExpression.Operators.Count() == 0 && arithmeticExpression.Values.Count() == 0)
+                return firstValue;
             else
                 return double.NaN;
-        }        
+        }
 
-        public double Compute(Operator op, double a, double b)
+        public double Compute(Operator operation, double a, double b)
         {
-            switch (op)
+            switch (operation)
             {
                 case Operator.Multiplication:
                     return a * b;
@@ -59,53 +63,61 @@ namespace HungarianCalculator
             }
         }
 
-        public ArithmeticExpression ProcessInput(string ArithmeticString)
+        public ArithmeticExpression GetArithmeticExpression(string InputString, bool isUseBrackets = true)
         {
+            if (InputString is null)
+                return null;
+
             ArithmeticExpression result = new();
-            Stack<char> brackets = new Stack<char>();
-            int numberCounter = 0;
+            Stack<char> bracketsStack = new Stack<char>();
+            int digitNumber = 0;
             bool isNumber = false;
-            double addNumber;
-            char[] tokens = ArithmeticString.ToCharArray();
-            for (int i = 0; i < tokens.Length; i++)
+            double numberInString;
+            char[] inputStringChars = InputString.ToCharArray();
+            for (int i = 0; i < inputStringChars.Length; i++)
             {
-                var ab = tokens[i];
-                if (char.IsDigit(tokens[i]))
+                if (char.IsDigit(inputStringChars[i]))
                 {
                     isNumber = true;
-                    numberCounter++;
+                    digitNumber++;
+                    if (i == inputStringChars.Length - 1)
+                    {
+                        double.TryParse(InputString.Substring(i - digitNumber + 1, digitNumber), out numberInString);
+                        result.Values.Enqueue(numberInString);
+                    }
+                    continue;
                 }
                 else
                 {
                     if (isNumber)
                     {
-                        double.TryParse(ArithmeticString.Substring(i - numberCounter, numberCounter), out addNumber);
-                        result.Values.Enqueue(addNumber);
-                        numberCounter = 0;
+                        double.TryParse(InputString.Substring(i - digitNumber, digitNumber), out numberInString);
+                        result.Values.Enqueue(numberInString);
+                        digitNumber = 0;
                         isNumber = false;
                     }
                 }
 
-                if (tokens[i] == '(')
+                if (inputStringChars[i] == '(' && !isUseBrackets)
+                    return null;
+                else if (inputStringChars[i] == '(' && isUseBrackets)
                 {
-                    var str = ArithmeticString.Substring(i + 1, tokens.Length - i - 1);
-                    var pi = ProcessInput(str);
-                    var numberInBrackets = Calculate(pi);
-                    result.Values.Enqueue(numberInBrackets);
+                    string substringAfterBrackets = InputString.Substring(i + 1, inputStringChars.Length - i - 1);
+                    result.Values.Enqueue(Calculate(GetArithmeticExpression(substringAfterBrackets)));
 
-                    brackets.Push('(');
-                    for (int j = 0; j < str.Length; j++)
+                    bracketsStack.Push('(');
+                    for (int j = 0; j < substringAfterBrackets.Length; j++)
                     {
-                        if (brackets.Count == 0)
+                        if (bracketsStack.Count == 0)
                         {
                             break;
                         }
-                        if (str[j] == '(')
-                            brackets.Push('(');
-                        if (str[j] == ')')
+                        if (substringAfterBrackets[j] == '(')
+                            bracketsStack.Push('(');
+                        if (substringAfterBrackets[j] == ')')
                         {
-                            brackets.Pop();
-                            if (brackets.Count == 0)
+                            bracketsStack.Pop();
+                            if (bracketsStack.Count == 0)
                             {
                                 i = i + j + 1;
                                 break;
@@ -113,25 +125,34 @@ namespace HungarianCalculator
                         }
                     }
                     continue;
-                    ////TODO :неверное количество скобок
-                }                
+                }
 
-                if (tokens[i].isOperator())
-                    result.Operators.Enqueue(tokens[i].ToOperator());
-
-                if (string.IsNullOrWhiteSpace(tokens[i].ToString()))
+                if (char.IsLetter(inputStringChars[i]))
                     continue;
 
-                if (tokens[i] == ')')
+                if (inputStringChars[i].isOperator())
                 {
-                    return result;
+                    result.Operators.Enqueue(inputStringChars[i].ToOperator());
+                    continue;
                 }
 
-                if (i == tokens.Length - 1)
+                if (string.IsNullOrWhiteSpace(inputStringChars[i].ToString()))
+                    continue;
+
+                if (inputStringChars[i] == ')' && !isUseBrackets)
                 {
-                    double.TryParse(ArithmeticString.Substring(i - numberCounter + 1, numberCounter), out addNumber);
-                    result.Values.Enqueue(addNumber);
+                    return null;
                 }
+                else if (inputStringChars[i] == ')')
+                    return result;
+
+                if (i == inputStringChars.Length - 1)
+                {
+                    double.TryParse(InputString.Substring(i - digitNumber + 1, digitNumber), out numberInString);
+                    result.Values.Enqueue(numberInString);
+                }
+
+                return null;
             }
             return result;
         }

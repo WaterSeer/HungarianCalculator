@@ -7,6 +7,5 @@ namespace HungarianCalculator
     {
         Queue<Operator> Operators { get; set; }
         Queue<double> Values { get; set; }
-        //bool CheckExpression
     }
 }

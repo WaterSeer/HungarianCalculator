@@ -7,10 +7,8 @@ namespace HungarianCalculator
     {
         static void Main(string[] args)
         {
-            ArithmeticExpression ae = new ArithmeticExpression();
-            Calculator c = new Calculator();
-
-            string userInput;            
+            Calculator calculator = new Calculator();
+            string userInput;
             while (true)
             {
                 Console.WriteLine("Введите выражение, путь к файлу или q для выхода");
@@ -18,7 +16,7 @@ namespace HungarianCalculator
 
                 if (userInput == 'q'.ToString())
                     break;
-                
+
                 if (File.Exists(userInput))
                 {
                     Console.WriteLine("Направлен в файл result.txt\n");
@@ -29,8 +27,7 @@ namespace HungarianCalculator
                     continue;
                 }
 
-               
-                switch (c.Calculate(c.ProcessInput(userInput)))
+                switch (calculator.Calculate(calculator.GetArithmeticExpression(userInput, false)))
                 {
                     case double.NegativeInfinity:
                         Console.WriteLine("Ошибка деления на ноль\n");
@@ -42,10 +39,10 @@ namespace HungarianCalculator
                         Console.WriteLine("Ошибка в выражении\n");
                         break;
                     default:
-                        Console.WriteLine(c.Calculate(c.ProcessInput(userInput))+"\n");
+                        Console.WriteLine(calculator.Calculate(calculator.GetArithmeticExpression(userInput)) + "\n");
                         break;
                 }
-            }           
+            }
         }
     }
 }

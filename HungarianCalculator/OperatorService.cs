@@ -8,7 +8,7 @@
             Multiplication,
             Division,
             Sum,
-            Subtraction,
+            Subtraction
         }
 
         public enum Precedense
