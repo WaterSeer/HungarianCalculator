@@ -1,4 +1,4 @@
-# Простой калькулятор. 
+# Калькулятор Венгерской нотации. 
 
 [![.NET](https://github.com/WaterSeer/HungarianCalculator/actions/workflows/dotnet.yml/badge.svg)](https://github.com/WaterSeer/HungarianCalculator/actions/workflows/dotnet.yml)
 
